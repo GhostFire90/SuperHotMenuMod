@@ -72,8 +72,13 @@ namespace SuperhotMenuMod
     [BepInPlugin("superhotMenuModifier", "SHMenu Mod", "0.0")]
     public class SuperhotMenu : BaseUnityPlugin
     {
+        static Harmony harm = new Harmony("SuperHotMenuModifier");
         static List<XElement> menu_items = new List<XElement>();
-
+        public static void RePatch()
+        {
+            harm.PatchAll();
+            
+        }
         //Call in your Awake function in order for the menu to add it
         public static void RegisterMenuEntry(MenuEntry entry)
         {
@@ -89,7 +94,7 @@ namespace SuperhotMenuMod
 
         class log_listen : ILogListener
         {
-            Harmony harm = new Harmony("SuperHotMenuModifier");
+            
             public void Dispose()
             {
                 
@@ -99,7 +104,7 @@ namespace SuperhotMenuMod
             {
                 if(eventArgs.Level == LogLevel.Message && eventArgs.Data is string && (string)eventArgs.Data == "Chainloader startup complete")
                 {
-                    harm.PatchAll();   
+                    //SuperhotMenu.harm.PatchAll();   
                 }
             }
         }
@@ -126,7 +131,7 @@ namespace SuperhotMenuMod
             {
                 self.DATA.Element("Data").Add(elem);
             }
-            
+            SuperhotMenuMod.SuperhotMenu.GetMenuItems().Clear();
         }
 
         static FieldInfo f_DATA = typeof(piOsMenu).GetField("DATA", BindingFlags.Instance | BindingFlags.Public);
