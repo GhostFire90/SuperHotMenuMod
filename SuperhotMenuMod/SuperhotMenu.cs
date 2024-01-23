@@ -112,45 +112,13 @@ namespace SuperhotMenuMod
         void Awake()
         {
             BepInEx.Logging.Logger.Listeners.Add(new log_listen());
-            RegisterMenuEntry(new MenuEntry("test", MenuEntry.Entry_Type.App, typeof(APPquit)));
-        }
-        void Start()
-        {
-            //m_createDirectory = typeof(piOsMenu).GetMethod("CreateDirectoryStructure", BindingFlags.NonPublic | BindingFlags.Instance);
-            
-            Logger.Log(BepInEx.Logging.LogLevel.Info, $"Scene num {SceneManager.GetActiveScene().buildIndex}");
+            //RegisterMenuEntry(new MenuEntry("test", MenuEntry.Entry_Type.App, typeof(APPquit)));
         }
 
-        void Update()
-        {
-            if (!found)
-            {
-                var objs = GameObject.FindObjectsOfType<piOsMenu>();
-                if(objs.Length != 0)
-                {
-                    found = true;
-                    var file = new FileStream("menu_mod.xml", FileMode.OpenOrCreate);
-                    objs[0].DATA.Save(file);
-                    file.Close();
-                    
-
-                    
-                }
-            }
-        }
+        
 
     }
 
-    class APPTestSHM : SHGUIview
-    {
-        public override void OnEnter()
-        {
-            Debug.Log("Worked ?");
-            SHGUI.current.PopView();
-
-            base.OnEnter();
-        }
-    }
 
     [HarmonyPatch(typeof(piOsMenu), "CreateDirectoryStructure")]
     class MenuTranspiler
