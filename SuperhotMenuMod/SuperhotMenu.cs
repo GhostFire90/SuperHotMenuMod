@@ -78,6 +78,8 @@ namespace SuperhotMenuMod
     public class SuperhotMenu : BaseUnityPlugin
     {
         static List<XElement> menu_items = new List<XElement>();
+
+        //Call in your Awake function in order for the menu to add it
         public static void RegisterMenuEntry(MenuEntry entry)
         {
             menu_items.Add(entry.ToXML());
