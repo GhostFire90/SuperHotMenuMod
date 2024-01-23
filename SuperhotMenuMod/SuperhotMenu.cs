@@ -1,14 +1,9 @@
-﻿using System.IO;
-using System.Reflection;
+﻿using System.Reflection;
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
 using System.Reflection.Emit;
-
-using UnityEngine;
-using UnityEngine.SceneManagement;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Xml.Linq;
 using System;
