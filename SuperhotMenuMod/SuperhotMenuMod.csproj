@@ -73,6 +73,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>echo F | xcopy /y $(TargetPath) "C:/Program Files (x86)/Steam/steamapps/common/SUPERHOT/BepInEx/plugins/$(TargetFileName)"</PostBuildEvent>
+    <PostBuildEvent>echo F | xcopy /y $(TargetPath) "E:/Program Files (x86)/Steam/steamapps/common/SUPERHOT/BepInEx/plugins/$(TargetFileName)"</PostBuildEvent>
   </PropertyGroup>
 </Project>

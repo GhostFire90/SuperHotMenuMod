@@ -7,12 +7,14 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Xml.Linq;
 using System;
+using UnityEngine;
 
 namespace SuperhotMenuMod
 {
     public class MenuEntry
     {
-        public enum Entry_Type { Directory, App }
+        public enum Entry_Type { Directory, App, UserLevel }
+        [Obsolete("This is only still here for backwards compat")]
         public MenuEntry(string name, Entry_Type entry, Type app_class)
         {
             if(entry == Entry_Type.App)
@@ -24,11 +26,56 @@ namespace SuperhotMenuMod
                     throw new Exception("cannot be an app with a null class");
                 }
             }
-            else
+            else if(entry == Entry_Type.Directory)
             {
                 children = new List<MenuEntry>();
                 isDir = true;
             }
+            type = entry;
+            Name = name;
+        }
+        /// <summary>
+        /// used to create an "app" entry
+        /// </summary>
+        /// <param name="name">Visible name of the entry</param>
+        /// <param name="app_class">typeof(child class of SHGUIview)</param>
+        /// <exception cref="Exception"></exception>
+        public MenuEntry(string name, Type app_class)
+        {
+            type = Entry_Type.App;
+            if(app_class == null)
+            {
+                throw new Exception("cannot be an app with a null class");
+            }
+            Assembly_Name = app_class.AssemblyQualifiedName;
+            isDir = false;
+            Name = name;
+
+        }
+        /// <summary>
+        /// Entry to load a custom asset bundled scene
+        /// </summary>
+        /// <param name="name">Visible name of the entry</param>
+        /// <param name="asset_bundle_name">Path from SH_Data to the asset bundle</param>
+        /// <param name="asset_path">Path inside the asset bundle, usually Assets/Scene/SceneName</param>
+        public MenuEntry(string name, string asset_bundle_name, string asset_path)
+        {
+            type = Entry_Type.UserLevel;
+            bundle_path = asset_bundle_name;
+            scene_path = asset_path;
+            isDir = false;
+            Name = name;
+
+        }
+        /// <summary>
+        /// Creates a directory
+        /// </summary>
+        /// <param name="name">Visible name of the entry</param>
+        public MenuEntry(string name)
+        {
+            type = Entry_Type.Directory;
+            children = new List<MenuEntry>();
+            isDir = true;
             Name = name;
         }
         public void AddChild(MenuEntry entry)
@@ -41,30 +88,53 @@ namespace SuperhotMenuMod
         }
         public XElement ToXML()
         {
-            if (isDir)
+            switch (type)
             {
-                var elem = new XElement(Name);
-                foreach(var child in children)
-                {
-                    elem.Add(child.ToXML());
-                }
-                return elem;
+                case Entry_Type.Directory:
+                    {
+                        var elem = new XElement(Name);
+                        foreach (var child in children)
+                        {
+                            elem.Add(child.ToXML());
+                        }
+                        return elem;
+                    }
+                    
+                case Entry_Type.App:
+                    {
+                        var elem = new XElement("item");
+                       
+                        elem.Add(
+                                new XAttribute("type", "app"),
+                                new XAttribute("name", Name),
+                                new XAttribute("appclass", Assembly_Name)
+                            );
+                        return elem;
+                    }
+                    
+                case Entry_Type.UserLevel:
+                    {
+                        var elem = new XElement("item");
+                        elem.Add(
+                            new XAttribute("type", "userlevel"),
+                            new XAttribute("name", Name),                            
+                            new XAttribute("bundle", bundle_path),
+                            new XAttribute("scene", scene_path)
+                            );
+                        return elem;
+                    }    
+                
             }
-            else
-            {
-                var elem = new XElement("item");
-                elem.Add(
-                        new XAttribute("type", "app"),
-                        new XAttribute("name", Name),
-                        new XAttribute("appclass", Assembly_Name)
-                    );
-                return elem;
-            }
+            return null;
+            
         }
         private string Name;
         private string Assembly_Name;
         private bool isDir;
+        private Entry_Type type;
         private List<MenuEntry> children;
+        private string bundle_path;
+        private string scene_path;
 
     }
 
@@ -104,7 +174,7 @@ namespace SuperhotMenuMod
             {
                 if(eventArgs.Level == LogLevel.Message && eventArgs.Data is string && (string)eventArgs.Data == "Chainloader startup complete")
                 {
-                    //SuperhotMenu.harm.PatchAll();   
+                    SuperhotMenu.harm.PatchAll();   
                 }
             }
         }
@@ -112,10 +182,14 @@ namespace SuperhotMenuMod
         void Awake()
         {
             BepInEx.Logging.Logger.Listeners.Add(new log_listen());
-            //RegisterMenuEntry(new MenuEntry("test", MenuEntry.Entry_Type.App, typeof(APPquit)));
-        }
+            //RegisterMenuEntry(new MenuEntry("testScene", "test", "Assets/Scenes/SampleScene.unity"));
+            //RePatch();
 
+        }
+        bool printed = false;
         
+
+
 
     }
 
@@ -161,4 +235,6 @@ namespace SuperhotMenuMod
             
         }
     }
+
+
 }
