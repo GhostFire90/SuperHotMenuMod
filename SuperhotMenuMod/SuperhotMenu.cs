@@ -160,7 +160,6 @@ namespace SuperhotMenuMod
         }
         //MethodInfo m_createDirectory;
         
-        bool found = false;
 
         class log_listen : ILogListener
         {
@@ -182,12 +181,15 @@ namespace SuperhotMenuMod
         void Awake()
         {
             BepInEx.Logging.Logger.Listeners.Add(new log_listen());
-            //RegisterMenuEntry(new MenuEntry("testScene", "test", "Assets/Scenes/SampleScene.unity"));
+            RegisterMenuEntry(new MenuEntry("testScene", "../test", "Assets/Scenes/SampleScene.unity"));
             //RePatch();
 
         }
-        bool printed = false;
         
+        private void Start()
+        {
+            
+        }
 
 
 
